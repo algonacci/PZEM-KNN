@@ -1,6 +1,8 @@
 import serial
 import numpy as np
 import pickle
+import warnings
+warnings.filterwarnings("ignore")
 
 # Meload model KNN dari file pickle
 with open('model_knn.pickle', 'rb') as f:
@@ -17,7 +19,7 @@ labels = ['Kipas Angin & Solder',
 
 # Buat objek Serial untuk berkomunikasi dengan Arduino
 # Ganti 'COM3' sesuai dengan port serial Arduino
-ser = serial.Serial('COM3', 9600)
+ser = serial.Serial('/dev/cu.usbserial-120', 9600)
 
 
 def receive_data():
@@ -43,6 +45,7 @@ def main():
             # Tampilkan hasil prediksi di layar LCD
             ser.write(
                 f"{predicted_classes[0]},{voltage},{current},{pf}".encode())
+            print(predicted_classes)
 
 
 if __name__ == "__main__":

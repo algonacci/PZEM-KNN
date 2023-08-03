@@ -2,7 +2,7 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
-PZEM004Tv30 pzem(D5, D6);
+// PZEM004Tv30 pzem(D5, D6);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void setup()
@@ -45,19 +45,12 @@ void sendSensorDataToPython(float voltage, float current, float pf)
 
 void loop()
 {
-  float voltage = pzem.voltage();
-  float current = pzem.current();
-  float pf = pzem.pf();
+  float voltage = 228.4;
+  float current = 0.04;
+  float pf = 0.09;
 
   if (!isnan(voltage) && !isnan(current) && !isnan(pf))
   {
-    Serial.print("Voltage : ");
-    Serial.print(voltage);
-    Serial.print("V, Current : ");
-    Serial.print(current);
-    Serial.print("A, PF : ");
-    Serial.println(pf);
-
     sendSensorDataToPython(voltage, current, pf);
 
     if (Serial.available())
