@@ -41,8 +41,8 @@ def main():
             predicted_classes = [labels[i] for i in predicted_labels]
 
             # Tampilkan hasil prediksi di layar LCD
-            lcd_message = f"{predicted_classes[0]}\n(V:{voltage}V, I:{current}A, PF:{pf})"
-            ser.write(lcd_message.encode())
+            ser.write(
+                f"{predicted_classes[0]},{voltage},{current},{pf}".encode())
 
 
 if __name__ == "__main__":

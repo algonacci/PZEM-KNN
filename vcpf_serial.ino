@@ -5,7 +5,8 @@
 PZEM004Tv30 pzem(D5, D6);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-void setup() {
+void setup()
+{
   Serial.begin(9600);
   lcd.begin(16, 2);
   lcd.backlight();
@@ -17,37 +18,39 @@ void setup() {
   lcd.clear();
 }
 
-void displayDataOnLCD(float voltage, float current, float pf) {
+void displayDataOnLCD(String prediction, float voltage, float current, float pf)
+{
+  lcd.clear();
   lcd.setCursor(0, 0);
+  lcd.print(prediction);
+  lcd.setCursor(0, 1);
   lcd.print("V:");
   lcd.print(voltage);
-
-  lcd.setCursor(0, 1);
+  lcd.setCursor(8, 1);
   lcd.print("I:");
   lcd.print(current);
-
-  lcd.setCursor(8, 0);
+  lcd.setCursor(0, 2);
   lcd.print("PF:");
   lcd.print(pf);
 }
 
-void sendSensorDataToPython(float voltage, float current, float pf) {
-  Serial.print("V:");
+void sendSensorDataToPython(float voltage, float current, float pf)
+{
   Serial.print(voltage);
   Serial.print(",");
-  Serial.print("I:");
   Serial.print(current);
   Serial.print(",");
-  Serial.print("PF:");
   Serial.println(pf);
 }
 
-void loop() {
+void loop()
+{
   float voltage = pzem.voltage();
   float current = pzem.current();
   float pf = pzem.pf();
 
-  if (!isnan(voltage) && !isnan(current) && !isnan(pf)) {
+  if (!isnan(voltage) && !isnan(current) && !isnan(pf))
+  {
     Serial.print("Voltage : ");
     Serial.print(voltage);
     Serial.print("V, Current : ");
@@ -55,9 +58,26 @@ void loop() {
     Serial.print("A, PF : ");
     Serial.println(pf);
 
-    displayDataOnLCD(voltage, current, pf);
     sendSensorDataToPython(voltage, current, pf);
-  } else {
+
+    if (Serial.available())
+    {
+      // Read the incoming data from Python
+      String data = Serial.readStringUntil('\n');
+      int separator1 = data.indexOf(',');
+      int separator2 = data.indexOf(',', separator1 + 1);
+
+      // Parse the received data
+      String prediction = data.substring(0, separator1);
+      voltage = data.substring(separator1 + 1, separator2).toFloat();
+      current = data.substring(separator2 + 1).toFloat();
+
+      // Display the received data on LCD
+      displayDataOnLCD(prediction, voltage, current, pf);
+    }
+  }
+  else
+  {
     Serial.println("Error reading sensor data");
   }
 
